@@ -25,6 +25,8 @@ body {
 }
 
 header {
+    background-color: rgb(89, 158, 214);
+    color: white;
     position: relative;
     box-shadow: 0px 6px 8px -6px rgb(207, 207, 207);
 }
@@ -54,6 +56,8 @@ main {
 }
 
 #player1, #player2 {
+    background-color: rgb(89, 158, 214);
+    color: white;
     width: 150px;
     display: flex;
     flex-direction: column;
@@ -64,6 +68,26 @@ main {
 #messageDisplay {
     width: 300px;
 }
+
+#start-btn {
+    padding: .8rem 2rem;
+    border: none;
+    border-radius: 8px;
+    box-shadow: rgba(180, 180, 180, 0.2) 2px 2px 4px 0px;
+    background-color: rgb(86, 189, 86);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+}
+
+#start-btn:hover {
+    background-color: white;
+    color: rgb(86, 189, 86);
+    border: 1px solid rgb(86, 189, 86);
+}
+
 
 #game-board {
     background-color: white;
@@ -89,6 +113,8 @@ main {
 }
 
 footer {
+    background-color: rgb(89, 158, 214);
+    color: white;
     font-size: 1rem;
     font-weight: 700;
 }

@@ -1,4 +1,3 @@
-// To Do List
 
 // Player Factory Function
 const playerFactory = (name, token) => {
@@ -19,7 +18,6 @@ const playerFactory = (name, token) => {
 // Create 2 players
 const player1 = playerFactory('player1', 'X');
 const player2 = playerFactory('player2', 'O');
-
 
 // Gameboard Module: displays tiles that are clickable
 const gameBoard = (function() {
@@ -76,9 +74,7 @@ const gameBoard = (function() {
         e.target.innerText = `${player1.token}`;
         player1.addToMoves(e.target.getAttribute('data-tile'));
     }
-
 })();
-
 
 // Module that displays the player tokens and decides the turn order and outcome of the game
 const gameController = (function() {
@@ -89,9 +85,13 @@ const gameController = (function() {
     let player1Display = document.getElementById('player1');
     let player2Display = document.getElementById('player2');
     let messageDisplay = document.getElementById('messageDisplay');
-
+    
     _render();
+
+    let gameStartBtn = document.getElementById('start-btn');
+    
     // Bind Events
+    gameStartBtn.addEventListener('click', gameStart);
 
     // Methods
     function _render() {
@@ -106,9 +106,37 @@ const gameController = (function() {
         player2Display.append(player2Token);
 
         let gameStartBtn = document.createElement('button');
+        gameStartBtn.setAttribute('id', 'start-btn');
         gameStartBtn.innerText = `Start Game`;
 
         messageDisplay.appendChild(gameStartBtn);
     }
+
+    function gameStart() {
+        gameStartBtn.classList.add('hide');
+
+        let randomFirstPlay = Math.floor(Math.random() * 10) + 1;
+        console.log(randomFirstPlay);
+
+        if (randomFirstPlay <= 5) {
+            player1.isTurn = true;
+        } else {
+            player2.isTurn = true;
+        }
+    }
+
+    // set Player Turn method -- include random turn order if player.moveArrays are length 0
+    // also set marker symbol based on who's turn it is
+
+    // Display Player Turn method
+
+    // play turn method
+
+    // check for win method
+
+    // Display Winner or Draw method
+
+    // reset gameBoard and player moveArrays method -- bring up a button that asks if they want to play another game
+
 })();
 
