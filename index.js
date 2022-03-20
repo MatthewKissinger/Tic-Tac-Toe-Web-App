@@ -11,7 +11,7 @@ const playerFactory = (name, token) => {
     }
 
     return {
-        name, token, isTurn, addToMoves
+        name, token, moveArray, isTurn, addToMoves
     }
 };
 
@@ -71,17 +71,20 @@ const gameBoard = (function() {
         e.target.classList.add('checked');
 
         // link function that uses the active player 
-        e.target.innerText = `${player1.token}`;
+        e.target.innerText = gameController.returnMarker();
         player1.addToMoves(e.target.getAttribute('data-tile'));
+
+        gameController.setPlayerTurn();
     }
 })();
 
 // Module that displays the player tokens and decides the turn order and outcome of the game
 const gameController = (function() {
     // variables
+    let _marker = '';
+    let _activePlayer = '';
 
     // cache DOM
-    let messageBoard = document.getElementById('message-board');
     let player1Display = document.getElementById('player1');
     let player2Display = document.getElementById('player2');
     let messageDisplay = document.getElementById('messageDisplay');
@@ -89,6 +92,7 @@ const gameController = (function() {
     _render();
 
     let gameStartBtn = document.getElementById('start-btn');
+    let playerTurnMessage = document.getElementById('turn-message');
     
     // Bind Events
     gameStartBtn.addEventListener('click', gameStart);
@@ -109,28 +113,58 @@ const gameController = (function() {
         gameStartBtn.setAttribute('id', 'start-btn');
         gameStartBtn.innerText = `Start Game`;
 
+        let playerTurnMessage = document.createElement('h3');
+        playerTurnMessage.setAttribute('id', 'turn-message');
+        playerTurnMessage.classList.add('hide');
+
         messageDisplay.appendChild(gameStartBtn);
+        messageDisplay.appendChild(playerTurnMessage);
     }
 
     function gameStart() {
         gameStartBtn.classList.add('hide');
 
-        let randomFirstPlay = Math.floor(Math.random() * 10) + 1;
-        console.log(randomFirstPlay);
+        setPlayerTurn();
+        playerTurnMessage.classList.remove('hide');
+    }
+    
+    function setPlayerTurn() {
+        // sets first move to random
+        if (player1.moveArray.length === 0 && player2.moveArray.length === 0) {
+            let randomFirstPlay = Math.floor(Math.random() * 10) + 1;
 
-        if (randomFirstPlay <= 5) {
-            player1.isTurn = true;
-        } else {
+            if (randomFirstPlay <= 5) {
+                player1.isTurn = true;
+                _marker = player1.token;
+            } else {
+                player2.isTurn = true;
+                _marker = player2.token;
+            }
+        } else if(_marker === player1.token) {
+            player1.isTurn = false;
+            _marker = player2.token;
             player2.isTurn = true;
+        } else {
+            _marker = player1.token;
+            player1.isTurn = true;
+            player2.isTurn = false;
+        }
+        displayPlayerTurn();
+        console.log(_marker);
+    }
+
+    // Display Player Turn method
+    function displayPlayerTurn() {
+        if (_marker === player1.token) {
+            playerTurnMessage.innerText = `Player 1's Turn`;
+        } else {
+            playerTurnMessage.innerText = `Player 2's Turn`;
         }
     }
 
-    // set Player Turn method -- include random turn order if player.moveArrays are length 0
-    // also set marker symbol based on who's turn it is
-
-    // Display Player Turn method
-
-    // play turn method
+    function returnMarker() {
+        return _marker;
+    }
 
     // check for win method
 
@@ -138,5 +172,10 @@ const gameController = (function() {
 
     // reset gameBoard and player moveArrays method -- bring up a button that asks if they want to play another game
 
+    return {
+        returnMarker, setPlayerTurn
+    }
+
 })();
+
 
