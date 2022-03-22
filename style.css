@@ -67,9 +67,10 @@ main {
 
 #messageDisplay {
     width: 300px;
+    position: relative;
 }
 
-#start-btn {
+#start-btn, #reset-btn {
     padding: .8rem 2rem;
     border: none;
     border-radius: 8px;
@@ -88,8 +89,32 @@ main {
     border: 1px solid rgb(86, 189, 86);
 }
 
+#reset-btn {
+    background-color: rgb(187, 87, 87);
+}
+
+#reset-btn:hover {
+    background-color: white;
+    color: rgb(187, 87, 87);
+    border: 1px solid rgb(187, 87, 87);
+}
+
+#outcome-container {
+    padding: 1rem;
+    font-size: 2rem;
+    width: 400px;
+    height: 400px;
+    position: absolute;
+    border: 1.5px solid rgb(230, 230, 230);
+    box-shadow: rgba(180, 180, 180, 0.2) 2px 2px 4px 0px;
+    border-radius: 8px;
+    background-color: rgba(89, 158, 214, 0.95);
+    color: white;
+}
+
 
 #game-board {
+    position: relative;
     background-color: white;
     width: 400px;
     height: 400px;
@@ -106,7 +131,7 @@ main {
     font-size: 3rem;
 }
 
-#game-board > div:hover {
+#game-board > div[data-tile]:hover {
     background-color: rgb(177, 177, 177);
     color: white;
     font-weight: 700;

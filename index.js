@@ -7,11 +7,14 @@ const playerFactory = (name, token) => {
 
     const addToMoves = (tile) => {
         moveArray.push(tile);
-        console.log(moveArray);
+    }
+
+    const clearMoveArray = () => {
+        moveArray.length = 0;
     }
 
     return {
-        name, token, moveArray, isTurn, addToMoves
+        name, token, moveArray, isTurn, addToMoves, clearMoveArray
     }
 };
 
@@ -41,6 +44,8 @@ const gameBoard = (function() {
 
             tile.setAttribute('data-tile', item);
             tile.classList.add('flex-center');
+            tile.classList.add('checked');
+            tile.classList.add('tile');
 
             // hash tag gameboard border styling
             if (item === 1 || item === 2 || item === 3) {
@@ -69,10 +74,16 @@ const gameBoard = (function() {
         }
 
         e.target.classList.add('checked');
-
-        // link function that uses the active player 
         e.target.innerText = gameController.returnMarker();
-        player1.addToMoves(e.target.getAttribute('data-tile'));
+
+        gameController.returnActivePlayer().addToMoves(e.target.getAttribute('data-tile'));
+        if (gameController.checkForWin(gameController.returnActivePlayer().moveArray)) {
+            gameController.displayOutcome(gameController.returnActivePlayer().name);
+            return;
+        } else if (gameController.checkForDraw()){
+            gameController.displayOutcome(`Draw`);
+            return;
+        }
 
         gameController.setPlayerTurn();
     }
@@ -88,14 +99,18 @@ const gameController = (function() {
     let player1Display = document.getElementById('player1');
     let player2Display = document.getElementById('player2');
     let messageDisplay = document.getElementById('messageDisplay');
+    let outcomeContainer = document.getElementById('outcome-container');
+    let outcomeMessage = document.getElementById('outcome-message');
     
     _render();
 
     let gameStartBtn = document.getElementById('start-btn');
+    let gameResetBtn = document.getElementById('reset-btn');
     let playerTurnMessage = document.getElementById('turn-message');
     
     // Bind Events
     gameStartBtn.addEventListener('click', gameStart);
+    gameResetBtn.addEventListener('click', resetGameBoard);
 
     // Methods
     function _render() {
@@ -113,15 +128,27 @@ const gameController = (function() {
         gameStartBtn.setAttribute('id', 'start-btn');
         gameStartBtn.innerText = `Start Game`;
 
+        let gameResetBtn = document.createElement('button');
+        gameResetBtn.setAttribute('id', 'reset-btn');
+        gameResetBtn.innerText = `New Game`;
+        gameResetBtn.classList.add('hide');
+
         let playerTurnMessage = document.createElement('h3');
         playerTurnMessage.setAttribute('id', 'turn-message');
         playerTurnMessage.classList.add('hide');
 
         messageDisplay.appendChild(gameStartBtn);
+        messageDisplay.appendChild(gameResetBtn);
         messageDisplay.appendChild(playerTurnMessage);
     }
 
     function gameStart() {
+        let tileNodes = document.querySelectorAll('.tile');
+        
+        tileNodes.forEach(tile => {
+            tile.classList.remove('checked');
+        })
+
         gameStartBtn.classList.add('hide');
 
         setPlayerTurn();
@@ -129,30 +156,32 @@ const gameController = (function() {
     }
     
     function setPlayerTurn() {
+
         // sets first move to random
         if (player1.moveArray.length === 0 && player2.moveArray.length === 0) {
             let randomFirstPlay = Math.floor(Math.random() * 10) + 1;
 
-            if (randomFirstPlay <= 5) {
-                player1.isTurn = true;
+            if (randomFirstPlay <= 5) {     
+                _activePlayer = player1;
                 _marker = player1.token;
             } else {
-                player2.isTurn = true;
+                _activePlayer = player2;
                 _marker = player2.token;
             }
         } else if(_marker === player1.token) {
-            player1.isTurn = false;
             _marker = player2.token;
-            player2.isTurn = true;
+            _activePlayer = player2;
         } else {
             _marker = player1.token;
-            player1.isTurn = true;
-            player2.isTurn = false;
+            _activePlayer = player1;
         }
         displayPlayerTurn();
-        console.log(_marker);
     }
 
+    function returnActivePlayer() {
+        return _activePlayer;
+    }
+    
     // Display Player Turn method
     function displayPlayerTurn() {
         if (_marker === player1.token) {
@@ -166,16 +195,88 @@ const gameController = (function() {
         return _marker;
     }
 
-    // check for win method
-
-    // Display Winner or Draw method
-
-    // reset gameBoard and player moveArrays method -- bring up a button that asks if they want to play another game
-
-    return {
-        returnMarker, setPlayerTurn
+    const multipleExist = function(array, test) {
+        return test.every(value => {
+            return array.includes(value);
+        });    
     }
 
+    // check for win method
+    function checkForWin(array) {
+        let winTest1 = ['1', '2', '3'];
+        let winTest2 = ['1', '4', '7'];
+        let winTest3 = ['1', '5', '9'];
+        let winTest4 = ['2', '5', '8'];
+        let winTest5 = ['3', '6', '9'];
+        let winTest6 = ['3', '5', '7'];
+        let winTest7 = ['4', '5', '6'];
+        let winTest8 = ['7', '8', '9'];
+
+        switch (true) {
+            case multipleExist(array, winTest1): 
+            case multipleExist(array, winTest2):
+            case multipleExist(array, winTest3):
+            case multipleExist(array, winTest4):
+            case multipleExist(array, winTest5):
+            case multipleExist(array, winTest6):
+            case multipleExist(array, winTest7):
+            case multipleExist(array, winTest8):
+            // logic for resetButton to display
+            playerTurnMessage.classList.add('hide');
+            gameResetBtn.classList.remove('hide');
+            return true;
+        }
+    }
+
+    function checkForDraw() {
+        let tileNodes = document.querySelectorAll('.tile');
+        let tilesArray = Array.from(tileNodes);
+
+        let check = tilesArray.every((tile) =>
+            tile.classList.contains('checked'));
+        
+        if (check) {
+            playerTurnMessage.classList.add('hide');
+            gameResetBtn.classList.remove('hide');
+        }
+
+        return check;
+    }
+        
+    // Display Winner or Draw method
+    function displayOutcome(name) {
+        outcomeContainer.classList.remove('hide');
+        outcomeContainer.classList.add('flex-center');
+        if (name === 'Draw') {
+            outcomeMessage.innerText = name;
+        } else {
+            outcomeMessage.innerText = `${name} wins!`;
+        }
+        
+    }
+
+    // reset gameBoard and player moveArrays method -- bring up a button that asks if they want to play another game
+    function resetGameBoard() {
+        console.log('reset the game');
+        gameResetBtn.classList.add('hide');
+        outcomeContainer.classList.remove('flex-center');
+        outcomeContainer.classList.add('hide');
+
+        let tileNodes = document.querySelectorAll('.tile');
+        
+        tileNodes.forEach(tile => {
+            tile.classList.remove('checked');
+            tile.innerText = '';
+        })
+        player1.clearMoveArray();
+        player2.clearMoveArray();
+        playerTurnMessage.classList.remove('hide');
+        setPlayerTurn();
+    }
+
+    return {
+        returnActivePlayer, returnMarker, setPlayerTurn, checkForWin, checkForDraw, displayOutcome
+    }
 })();
 
 
